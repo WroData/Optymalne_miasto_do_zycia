@@ -2,17 +2,17 @@ library(shiny)
 library(plotly)
 
 ui <- fluidPage(
-  headerPanel('Zale¿noœæ wielkoœci miasta od jakoœci ¿ycia'),
+  headerPanel('Zaleznosc wielkosci miasta od jakosci zycia'),
   sidebarPanel(
-    checkboxGroupInput("variable", "Dodatkowe fikuœe:",
-                       c("Wyró¿nij Wroc³aw" = "WRO",
-                         "Wyró¿nij miasta Polskie" = "PL",
-                         "Wyró¿nij stolice pañstw" = "ST",
-                         "Dodaj liniê trendu" = "TR",
-                         "Dodaj liniê mediany krocz¹cej" = "MED",
-                         "Dodaj wielkoœæ Warszawy po proponowanych reformach" = "WAW")),
+    checkboxGroupInput("variable", "Dodatkowe fikuse:",
+                       c("Wyroznij Wroc?aw" = "WRO",
+                         "Wyroznij miasta Polskie" = "PL",
+                         "Wyroznij stolice panstw" = "ST",
+                         "Dodaj linie trendu" = "TR",
+                         "Dodaj linie mediany krocz?cej" = "MED",
+                         "Dodaj wielko?? Warszawy po proponowanych reformach" = "WAW")),
     sliderInput(inputId = "num",
-                label = "Mediana krocz¹ca obserqacji",
+                label = "Mediana kroczaca obserqacji",
                 value = 25, min = 1, max = 100)
 
   ),
@@ -40,15 +40,15 @@ server <- function(input, output){
           labs(title= c(names(temp[5]), "vs QL.mercer")) +
           scale_x_continuous(limits = c(0, 5000000), labels = space) +
           scale_y_continuous(labels = minus) +
-          labs(title="Zale¿noœæ wielkoœci miasta od jakoœci ¿ycia", 
-               y= "Miejsce w rankingu jakoœci ¿ycia w miastach przeprowadzonym przez Numbeo", 
-               x="Populacja miasta",  col="Czy miasto jest stolic¹?", shape="# of gears") +
-          scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
-                               breaks=c("PRAWDA", "FA£SZ" ), labels=c("Tak", "Nie" )) +
-          scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
-                               breaks=c("PRAWDA", "FA£SZ" ), labels=c("Tak", "Nie" )) +
+          labs(title="Zale?no?? wielko?ci miasta od jako?ci ?ycia", 
+               y= "Miejsce w rankingu jako?ci ?ycia w miastach przeprowadzonym przez Numbeo", 
+               x="Populacja miasta",  col="Czy miasto jest stolic??", shape="# of gears") +
+          scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic??",
+                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
+          scale_shape_manual(values=c(16, 8),  name="Czy to Wroc?aw?",
+                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
           scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA£SZ" ), labels=c("Tak", "Nie" )) +
+                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
           theme( 
             panel.grid.minor = element_blank(),
             panel.border = element_blank(),
