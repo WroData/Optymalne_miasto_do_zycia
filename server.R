@@ -1,6 +1,20 @@
-
+library(fpp)  
+library(forecast) 
 
 dane <- readRDS("dane.Rds")
+temp <- dane[,c(1:6,9,7,8,10,12)]  
+temp <- temp[order(temp[,5]),]
+temp2 <- temp[!is.na(temp[,4]),]
+
+
+Wielka_Warszawa<-c(2000000,3000000)
+
+
+kolot_tla <- "grey90"
+kolor_czcionki <- "grey30"
+kolory2<-c('#fe9929','#993404') #skala kolor?w 
+wielkosc_czcionki <- 10
+
 
 ### funkcja zmiany formatu liczb do dodania spacji co 1 000
 space <- function(x, ...) { 
@@ -11,44 +25,29 @@ minus <- function(x, ...) {
     format(-x, ..., scientific = FALSE, trim = TRUE)
 }
 
+
+
 server <- function(input, output){
     
     
     output$plot1 <-  renderPlotly({
         
-        temp <- dane[,c(1:6,9,7,8,10,12)]  
-        temp <- temp[order(temp[,5]),]
-        temp2 <- temp[!is.na(temp[,4]),]
-        temp2$med_ql.Numbeo<- runmed(temp2[,4], 25, endrule = "median", algorithm = NULL, print.level = 0)
-        Wielka_Warszawa<-c(2000000,3000000)
-        
-        
-        kolot_tla <- "grey90"
-        kolor_czcionki <- "grey30"
-        kolory2<-c('#fe9929','#993404') #skala kolor?w 
-        wielkosc_czcionki <- 10
-        
-        
-        dane <- cbind(temp2, runmed(temp2[,4], input$num, endrule = "median", algorithm = NULL, print.level = 0))
+
+        dane <- data.frame(
+          cbind(temp2, runmed(temp2[,4], input$num, endrule = "median", algorithm = NULL, print.level = 0)))
         names(dane) <- c(names(temp2), "aa")
+        dane$bb <-  ma(temp2$QL.numbeo, order = input$num_sr, centre = T)
+
         
         
         a <- ggplot(dane, aes(x=Population, y=-QL.numbeo)) +
-            geom_point(aes(col=Czy.stolica, shape = Czy.Wroclaw, size = Czy.Polska)) +    
-            geom_path(aes(x=Population, y=-aa)) +
-            #geom_smooth(se=FALSE)+
+            geom_point() +
             labs(title= c(names(temp[5]), "vs QL.mercer")) +
             scale_x_continuous(limits = c(0, 5000000), labels = space) +
             scale_y_continuous(labels = minus) +
-            labs(title="Zale?no?? wielko?ci miasta od jako?ci ?ycia", 
-                 y= "Miejsce w rankingu jako?ci ?ycia w miastach przeprowadzonym przez Numbeo", 
-                 x="Populacja miasta",  col="Czy miasto jest stolic??", shape="# of gears") +
-            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic??",
-                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
-            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc?aw?",
-                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
-            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA?SZ" ), labels=c("Tak", "Nie" )) +
+            labs(tite="Zale¿noœæ wielkosœci miasta od jakoœci ¿ycia", 
+                 y= "\nMiejsce w rankingu jakoœci ¿ycia w miastach\nprzeprowadzonym przez Numbeo", 
+                 x= "\nPopulacja miasta") +
             theme( 
                 panel.grid.minor = element_blank(),
                 panel.border = element_blank(),
@@ -65,14 +64,96 @@ server <- function(input, output){
             )
         
         
-        if("WAW" %in% input$variable){
-        a <- a +  annotate("rect", xmin=min(Wielka_Warszawa), xmax=max(Wielka_Warszawa), ymin=-200, ymax=0, alpha=0.2, fill="blue") +
+        if("WAW" %in% input$variable ){
+        a <- a +  annotate("rect", xmin=min(Wielka_Warszawa), xmax=max(Wielka_Warszawa), ymin=-180, ymax=0, alpha=0.2, fill="blue") +
              annotate("text", x=mean(Wielka_Warszawa), y= -10 , label = "Wielka Warszawa", col="blue")
         }
         
         if("TR" %in% input$variable){
-        a <- a + geom_smooth(method=lm, se=FALSE)
+          a <- a + geom_smooth(method=lm, se=FALSE)
         }
+        if("MED" %in% input$variable){
+          a <- a + geom_path(aes(x=Population, y=-aa))
+        }
+        if("SR" %in% input$variable){
+          a <- a + geom_path(aes(x=Population, y=-bb), col="red")
+        }
+        
+        if(  "WRO" %in% input$variable  & 
+           !("PL"  %in% input$variable) &
+           !("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(shape = Czy.Wroclaw)) +  
+            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+        }        
+        
+        if( (!("WRO" %in% input$variable) && 
+              ("PL"  %in% input$variable) &&
+             !("ST"  %in% input$variable)) ){
+          a <- a + 
+            geom_point(aes(size = Czy.Polska)) +   
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))
+        }
+        if( !("WRO" %in% input$variable) & 
+            !("PL"  %in% input$variable) &
+             ("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(col=Czy.stolica)) +
+            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
+                             breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            
+        }
+        
+        if(   ("WRO" %in% input$variable) & 
+              ("PL"  %in% input$variable) &
+              !("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(shape = Czy.Wroclaw, size = Czy.Polska)) +  
+            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))
+          
+        } 
+        
+        if(    ("WRO" %in% input$variable) & 
+              !("PL"  %in% input$variable) &
+               ("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(shape = Czy.Wroclaw, col=Czy.stolica)) +  
+            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+        } 
+        
+        if(    !("WRO" %in% input$variable) & 
+               ("PL"  %in% input$variable) &
+               ("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(col=Czy.stolica, size = Czy.Polska)) +  
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) +
+            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+        } 
+        
+        if(    ("WRO" %in% input$variable) & 
+               ("PL"  %in% input$variable) &
+               ("ST"  %in% input$variable)){
+          a <- a + 
+            geom_point(aes(shape = Czy.Wroclaw, col=Czy.stolica, size = Czy.Polska)) +  
+            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) +
+            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
+                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+        } 
+          
+   
         
         
         q <- ggplotly(a)
