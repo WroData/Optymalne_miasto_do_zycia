@@ -1,10 +1,13 @@
 library(fpp)  
 library(forecast) 
 
+setwd("C:/Users/User/Documents/GitHub/Optymalne_miasto_do_zycia")
+
 dane <- readRDS("dane.Rds")
 temp <- dane[,c(1:6,9,7,8,10,12)]  
 temp <- temp[order(temp[,5]),]
 temp2 <- temp[!is.na(temp[,4]),]
+
 
 
 Wielka_Warszawa<-c(2000000,3000000)
@@ -30,7 +33,7 @@ minus <- function(x, ...) {
 server <- function(input, output){
     
     
-    output$plot1 <-  renderPlotly({
+    output$plot1 <-  renderPlot({
         
 
         dane <- data.frame(
@@ -156,7 +159,16 @@ server <- function(input, output){
    
         
         
-        q <- ggplotly(a)
-        q
+        a
+
+    })
+    
+    output$click_info <- renderPrint({
+      nearPoints(dane, input$plot_click, addDist = T)
+    })
+    
+    output$brush_info <- renderPrint({
+      brushedPoints(dane, input$plot_brush)
     })
 }
+

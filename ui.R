@@ -29,7 +29,15 @@ ui <- fluidPage(
         
     ),
     mainPanel(
-        plotlyOutput('plot1')
-    )
+      plotOutput('plot1',  click = "plot_click", brush = brushOpts(id = "plot1_brush")),
+      h4("Points near click"),
+      verbatimTextOutput("click_info"),
+      h4("Brushed points"),
+      verbatimTextOutput("brush_info")
+      
+      )
+      
+         
+            
     
 )
