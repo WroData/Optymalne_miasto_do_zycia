@@ -1,7 +1,7 @@
 
- setwd("D:/KK/OneDrive/Wroclaw w Liczbach/Gotowe projekty/Optymalna wielkosæ miasta")
+# setwd("D:/KK/OneDrive/Wroclaw w Liczbach/Gotowe projekty/Optymalna wielkosÄ‡ miasta")
 
-dane <- read.csv2("dane.csv", header = T)  
+#dane <- read.csv2("dane.csv", header = T)  
 
 
 
@@ -31,7 +31,7 @@ ggplot(dane, aes(x=Gestosc, y=QL.numbeo, col=Czy.Wroclaw)) +
 
 options(scipen=999) 
 
-#wyliczenie mediany po populacji - sprawdzenie które optymalne
+#wyliczenie mediany po populacji - sprawdzenie ktÃ³re optymalne
 
 #png(filename="pop_mercer proba median.png", width = 30, height = 6, units = 'in', res = 500)
 
@@ -69,8 +69,8 @@ plot_list = list()
 
 i=1
 temp <- dane[,c(1:6,9,7,8,10)]
-temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'Wroc³aw'))
-temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "Wroc³aw"
+temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'WrocÅ‚aw'))
+temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "WrocÅ‚aw"
 temp$Population <- temp$Population/1000
 temp <- temp[order(temp[,i+4]),]
 temp1 <- temp[!is.na(temp[,3]),]
@@ -92,8 +92,8 @@ plot_list[[(i-1)*2+2]] = p
 
 i=2
 temp <- dane[,c(1:6,9,7,8,10)]
-temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'Wroc³aw'))
-temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "Wroc³aw"
+temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'WrocÅ‚aw'))
+temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "WrocÅ‚aw"
 temp$Population <- temp$Population/1000
 temp <- temp[order(temp[,i+4]),]
 temp1 <- temp[!is.na(temp[,3]),]
@@ -115,8 +115,8 @@ plot_list[[(i-1)*2+2]] = p
 
 i=3
 temp <- dane[,c(1:6,9,7,8,10)]
-temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'Wroc³aw'))
-temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "Wroc³aw"
+temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'WrocÅ‚aw'))
+temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "WrocÅ‚aw"
 temp$Population <- temp$Population/1000
 temp <- temp[order(temp[,i+4]),]
 temp1 <- temp[!is.na(temp[,3]),]
@@ -154,8 +154,8 @@ dev.off()
 # wybrany wykres
 i=1
 temp <- dane[,c(1:6,9,7,8,10)]
-temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'Wroc³aw'))
-temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "Wroc³aw"
+temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'WrocÅ‚aw'))
+temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "WrocÅ‚aw"
 temp$Population <- temp$Population/1000 
 temp <- temp[order(temp[,i+4]),]
 temp2 <- temp[!is.na(temp[,4]),]
@@ -174,11 +174,11 @@ dev.off()
 
 
 
-# wybrany wykres - proba na wartoœciach rankingu, nie na rankingu
+# wybrany wykres - proba na wartoÅ›ciach rankingu, nie na rankingu
 i=1
 temp <- dane[,c(1:6,9,11,7,8,10)]
-temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'Wroc³aw'))
-temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "Wroc³aw"
+temp$Czy.stolica <- factor(temp$Czy.stolica, levels=c(levels(temp$Czy.stolica), 'WrocÅ‚aw'))
+temp$Czy.stolica[temp$Czy.Wroclaw=="PRAWDA"] <- "WrocÅ‚aw"
 temp$Population <- temp$Population/1000 
 temp <- temp[order(temp[,i+4]),]
 temp2 <- temp[!is.na(temp[,4]),]

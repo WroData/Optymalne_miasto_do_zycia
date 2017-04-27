@@ -1,16 +1,22 @@
 library(fpp)  
 library(forecast) 
 
-setwd("C:/Users/User/Documents/GitHub/Optymalne_miasto_do_zycia")
+#setwd("C:/Users/User/Documents/GitHub/Optymalne_miasto_do_zycia")
+#danee <- read.csv2("Dane.csv", header = T) 
+
+
+skalar <- 100000
+
+#temp <- danee[,c(1:6,9,7,8,10,12)]  
+#temp$Population <- temp$Population / skalar
+#temp <- temp[order(temp[,5]),]
+#temp <- temp[!is.na(temp[,4]),]
+#dane <- temp[, c(1, 2, 4, 5)] 
+#saveRDS(dane, file="dane.Rds")
 
 dane <- readRDS("dane.Rds")
-temp <- dane[,c(1:6,9,7,8,10,12)]  
-temp <- temp[order(temp[,5]),]
-temp2 <- temp[!is.na(temp[,4]),]
 
-
-
-Wielka_Warszawa<-c(2000000,3000000)
+Wielka_Warszawa <- c(3250000,3750000) / skalar
 
 
 kolot_tla <- "grey90"
@@ -21,7 +27,7 @@ wielkosc_czcionki <- 10
 
 ### funkcja zmiany formatu liczb do dodania spacji co 1 000
 space <- function(x, ...) { 
-    format(x, ..., big.mark = " ", scientific = FALSE, trim = TRUE)
+    format(x * skalar, ..., big.mark = " ", scientific = FALSE, trim = TRUE)
 }
 ### funkcja zmiany formatu liczb do odwrotnosci (aby ranking by? logiczny)
 minus <- function(x, ...) { 
@@ -37,19 +43,18 @@ server <- function(input, output){
         
 
         dane <- data.frame(
-          cbind(temp2, runmed(temp2[,4], input$num, endrule = "median", algorithm = NULL, print.level = 0)))
-        names(dane) <- c(names(temp2), "aa")
-        dane$bb <-  ma(temp2$QL.numbeo, order = input$num_sr, centre = T)
+          cbind(dane, runmed(dane[,3], input$num, endrule = "median", algorithm = NULL, print.level = 0)))
+        names(dane) <- c(names(dane[,1:4]), "aa")
+        dane$bb <-  ma(dane$QL.numbeo, order = input$num_sr, centre = T)
 
         
         
         a <- ggplot(dane, aes(x=Population, y=-QL.numbeo)) +
             geom_point() +
-            labs(title= c(names(temp[5]), "vs QL.mercer")) +
-            scale_x_continuous(limits = c(0, 5000000), labels = space) +
+            scale_x_continuous(limits = c(0, 5000000 / skalar), labels = space) +
             scale_y_continuous(labels = minus) +
-            labs(tite="Zale¿noœæ wielkosœci miasta od jakoœci ¿ycia", 
-                 y= "\nMiejsce w rankingu jakoœci ¿ycia w miastach\nprzeprowadzonym przez Numbeo", 
+            labs(title="ZaleÅ¼noÅ›Ä‡ wielkosÅ›ci miasta od jakoÅ›ci Å¼ycia", 
+                 y= "\nMiejsce w rankingu jakoÅ›ci Å¼ycia w miastach\nprzeprowadzonym przez Numbeo", 
                  x= "\nPopulacja miasta") +
             theme( 
                 panel.grid.minor = element_blank(),
@@ -87,8 +92,8 @@ server <- function(input, output){
            !("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(shape = Czy.Wroclaw)) +  
-            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            scale_shape_manual(values=c(16, 8),  name="Czy to WrocÅ‚aw?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) 
         }        
         
         if( (!("WRO" %in% input$variable) && 
@@ -96,16 +101,16 @@ server <- function(input, output){
              !("ST"  %in% input$variable)) ){
           a <- a + 
             geom_point(aes(size = Czy.Polska)) +   
-            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?     ",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" ))
         }
         if( !("WRO" %in% input$variable) & 
             !("PL"  %in% input$variable) &
              ("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(col=Czy.stolica)) +
-            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
-                             breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            scale_color_manual(values=kolory2,   name="Czy miasto jest    \nstolicÄ…?",
+                             breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) 
             
         }
         
@@ -114,10 +119,10 @@ server <- function(input, output){
               !("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(shape = Czy.Wroclaw, size = Czy.Polska)) +  
-            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
-            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))
+            scale_shape_manual(values=c(16, 8),  name="Czy to WrocÅ‚aw?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?     ",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" ))
           
         } 
         
@@ -126,10 +131,10 @@ server <- function(input, output){
                ("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(shape = Czy.Wroclaw, col=Czy.stolica)) +  
-            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
-            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            scale_shape_manual(values=c(16, 8),  name="Czy to WrocÅ‚aw?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_color_manual(values=kolory2,   name="Czy miasto jest     \nstolicÄ…?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) 
         } 
         
         if(    !("WRO" %in% input$variable) & 
@@ -137,10 +142,10 @@ server <- function(input, output){
                ("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(col=Czy.stolica, size = Czy.Polska)) +  
-            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) +
-            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?      ",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) +
+            scale_color_manual(values=kolory2,   name="Czy miasto jest     \nstolicÄ…?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) 
         } 
         
         if(    ("WRO" %in% input$variable) & 
@@ -148,12 +153,12 @@ server <- function(input, output){
                ("ST"  %in% input$variable)){
           a <- a + 
             geom_point(aes(shape = Czy.Wroclaw, col=Czy.stolica, size = Czy.Polska)) +  
-            scale_shape_manual(values=c(16, 8),  name="Czy to Wroc³aw?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" ))  + 
-            scale_size_manual (values=c(2, 5),   name="Czy to Polska?         ",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) +
-            scale_color_manual(values=kolory2,   name="Czy miasto jest      \nstolic¹?",
-                               breaks=c("PRAWDA", "FA³SZ" ), labels=c("Tak", "Nie" )) 
+            scale_shape_manual(values=c(16, 8),  name="Czy to WrocÅ‚aw?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" ))  + 
+            scale_size_manual (values=c(2, 5),   name="Czy to Polska?      ",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) +
+            scale_color_manual(values=kolory2,   name="Czy miasto jest    \nstolicÄ…?",
+                               breaks=c("PRAWDA", "FAÅ‚SZ" ), labels=c("Tak", "Nie" )) 
         } 
           
    
@@ -164,11 +169,14 @@ server <- function(input, output){
     })
     
     output$click_info <- renderPrint({
-      nearPoints(dane, input$plot_click, addDist = T)
+      nearPoints(dane, input$plot_click, addDist = TRUE, threshold = 70,
+                 xvar ="Population", yvar = "QL.numbeo")
     })
     
     output$brush_info <- renderPrint({
-      brushedPoints(dane, input$plot_brush)
+      brushedPoints(dane, input$plot_brush, 
+                    xvar = "Population", yvar = "QL.numbeo",
+                    panelvar1 ="Population", panelvar2 = "QL.numbeo")
     })
 }
 
